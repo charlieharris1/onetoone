@@ -1,6 +1,6 @@
 import React from 'react';
 require('normalize.css');
-require('styles/App.css');
+require('styles/CommentBox.css');
 global.jQuery = require('jquery');
 require('bootstrap-webpack');
 
@@ -40,7 +40,7 @@ class AppComponent extends React.Component {
       	<form onSubmit={this.handleSubmit}>
       		<div className="col-md-12">
 	      		<textarea className="form-control" rows="4" cols="20" value={this.state.text} onChange={this.handleTextChange}></textarea>
-	      		<button className="btn btn-default" type="submit">Submit</button>
+	      		<div className="pull-right submit"><button className="btn btn-default" type="submit">Post comment</button></div>
 	    	</div>
 	    </form>
       </div>

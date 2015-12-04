@@ -17,3 +17,13 @@ body {
   border-width: 1px 0;
   background: #666;
 }
+
+.navbar {
+  margin-bottom: 0 !important;
+}
+
+.selector {
+  background: #ffaaaa;
+  margin-bottom: 30px;
+  padding: 8px 30px 8px 30px;
+}

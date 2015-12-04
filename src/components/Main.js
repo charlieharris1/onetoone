@@ -7,8 +7,8 @@ import ReactFireMixin from 'reactfire';
 import reactMixin from 'react-mixin';
 import CommentBox from './CommentBox';
 import _ from 'lodash';
-
 import React from 'react';
+import Markdown from 'react-remarkable'
 
 let yeomanImage = require('../images/yeoman.png');
 
@@ -17,11 +17,10 @@ class AppComponent extends React.Component {
 	constructor(props, context) {
 		super(props, context);
 		this.state = {
-			loggedIn: false,
 			userData: [],
 			currentUser: {},
       loggedInUser: {},
-      users: [],
+      users: {},
       comments: {},
 		}
 		this.onCommentSubmit = this.onCommentSubmit.bind(this)
@@ -59,39 +58,19 @@ class AppComponent extends React.Component {
   render() {
   	const entries = this.state.comments[this.state.currentUser.uid]
     ?  _.sortBy(_.toArray(this.state.comments[this.state.currentUser.uid],'timestamp')).reverse().map((entry) => {
-  		return <div className="row">
-  						<div className="col-md-12">
-  			   			<p className="text-left">{entry.comment}</p>
-                <p className="text-right">{new Date(entry.timestamp).toString()}</p>
-  			   			<span className="pull-right">
-                <img src={this.state.users[entry.author].github.profileImageURL} alt="Profile picture" height="42" width="42"/>
-                </span>
-  			   		</div>
-  			   		<hr></hr>
-  			   	</div>
-  	})
-    : <div></div>
-
-  	const template = this.state.loggedIn
-  	? (
-      <div class="container">
-  		  <nav className="navbar navbar-inverse navbar-static-top" role="navigation">
-    			<div className="container">
-    			<p className="navbar-brand">{this.state.loggedInUser.github && this.state.loggedInUser.github.displayName}</p>
-    			</div>
-  		  </nav>
-     		<h1>Comments on {this.state.currentUser.github && this.state.currentUser.github.displayName}</h1>
-     		<div className="pull-right">
-        	{this.state.loggedIn && 'logged in'}
-        </div>
-        <CommentBox onCommentSubmit={this.onCommentSubmit} />
-        	<div className="col-md-9">
-          	<div className="well">
-          	 {entries}
-            </div>
+      return (<div className="well">
+        <div className="row">
+          <div className="col-xs-3">
+            {new Date(entry.timestamp).toString()}
+            <img src={this.state.users[entry.author] && this.state.users[entry.author].github.profileImageURL} alt="Profile picture" height="42" width="42" />
           </div>
-      </div>)
-  	: '<div>You are not logged in</div>'
+          <div className="col-xs-9">
+            <Markdown>{entry.comment}</Markdown>
+          </div>
+        </div>
+      </div>);
+  	})
+    : <div></div>;
 
     const userList = Object.keys(this.state.users).map((key) => {
       return {
@@ -100,16 +79,48 @@ class AppComponent extends React.Component {
       }
     });
     const users = userList.map((user) => {
-      return <option value={user.uid}>{user.displayName}</option>
-    })
+      const selected = user.uid === this.state.loggedInUser ? 'selected' : false;
+      return <option value={user.uid} selected={selected}>{user.displayName}</option>
+    })    
 
     const selector = this.state.users[this.state.loggedInUser] && this.state.users[this.state.loggedInUser].isAdmin
     ? <select onChange={this.selectUser}>{users}</select>
     : <div></div>
 
+  	const template = this.state.loggedInUser
+  	? (
+      <div>
+  		  <nav className="navbar navbar-inverse navbar-static-top" role="navigation">
+          <div className="navbar-header">
+    			   <p className="navbar-brand">{this.state.users[this.state.loggedInUser] && this.state.users[this.state.loggedInUser].github.displayName}</p>
+          </div>
+          <div className="nav navbar-nav navbar-right">
+            <button className="btn">Log out</button>
+          </div>
+  		  </nav>
+      <div className="row">
+        <div className="col-xs-12 selector">
+          <span className="pull-left">Comments on {this.state.currentUser.github && this.state.currentUser.github.displayName}</span>
+          <div className="pull-right">{selector}</div>
+        </div>
+      </div>
+
+      <div className="container">
+        <div className="row">
+          <div className="col-xs-6">
+            {entries}
+          </div>
+    
+          <div className="col-xs-6">
+            <CommentBox onCommentSubmit={this.onCommentSubmit} />
+          </div>
+        </div>
+      </div>
+      </div>)
+  	: <div>You are not logged in</div>
+
     return (
     <div>
-      {selector}
       {template}
     </div>
     );
