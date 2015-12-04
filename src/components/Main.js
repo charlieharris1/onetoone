@@ -46,7 +46,7 @@ class AppComponent extends React.Component {
 
 	onCommentSubmit(comment, cb) {
 		var ref = new Firebase(`https://one-to-one.firebaseio.com/comments/${this.state.currentUser.uid}`);
-		ref.push({ author: this.state.loggedInUser, comment: comment });
+		ref.push({ author: this.state.loggedInUser, comment: comment, timestamp: Firebase.ServerValue.TIMESTAMP });
 		cb();
 	}
 
@@ -62,9 +62,10 @@ class AppComponent extends React.Component {
   		return <div className="row">
   						<div className="col-md-12">
   			   			<p className="text-left">{entry.comment}</p>
+                <p className="text-right">{new Date(entry.timestamp).toString()}</p>
   			   			<span className="pull-right">
-  			   			<img src={this.state.currentUser.github.profileImageURL} alt="Profile picture" height="42" width="42"/>
-  			   			</span>
+                <img src={this.state.users[entry.author].github.profileImageURL} alt="Profile picture" height="42" width="42"/>
+                </span>
   			   		</div>
   			   		<hr></hr>
   			   	</div>
