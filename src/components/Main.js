@@ -33,14 +33,13 @@ class AppComponent extends React.Component {
 		    	console.log('Login Failed!', error);
 		    }
 		    this.setState({loggedIn: true})
-        authData.isAdmin = true;
         this.setState({loggedInUser: authData})
 		    this.setState({currentUser: authData})
 		    this.bindAsArray(ref.child(`comments/${authData.uid}`), 'userData');
 
         this.bindAsObject(ref.child(`users`), 'users');
 
-        ref.child(`users/${authData.uid}`).set(authData);
+        ref.child(`users/${authData.uid}`).update(authData);
 	  	})
 	}
 
@@ -74,7 +73,7 @@ class AppComponent extends React.Component {
       <div class="container">
   		  <nav className="navbar navbar-inverse navbar-static-top" role="navigation">
     			<div className="container">
-    			<p className="navbar-brand">{this.state.currentUser.github && this.state.currentUser.github.displayName}</p>
+    			<p className="navbar-brand">{this.state.loggedInUser.github && this.state.loggedInUser.github.displayName}</p>
     			</div>
   		  </nav>
      		<h1>Comments on {this.state.currentUser.github && this.state.currentUser.github.displayName}</h1>
@@ -106,7 +105,6 @@ class AppComponent extends React.Component {
 
     return (
     <div>
-      {selector}
       {template}
     </div>
     );
