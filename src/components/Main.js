@@ -1,5 +1,7 @@
 require('normalize.css');
 require('styles/App.css');
+global.jQuery = require('jquery');
+require('bootstrap-webpack');
 import Firebase from 'firebase';
 import ReactFireMixin from 'reactfire';
 import reactMixin from 'react-mixin';
@@ -44,21 +46,33 @@ class AppComponent extends React.Component {
 
   render() {
   	const entries = this.state.userData.reverse().map((entry) => {
-  		return <div>
-  			   	<p>{entry['.value']}</p>
-  			   	<img src={this.state.currentUser.github.profileImageURL} alt="Profile picture" height="42" width="42"/>
-  			   </div>
+  		return <div className="row">
+  						<div className="col-md-12">
+  			   			<p className="text-left">{entry['.value']}</p>
+  			   			<span className="pull-right">
+  			   			<img src={this.state.currentUser.github.profileImageURL} alt="Profile picture" height="42" width="42"/>
+  			   			</span>
+  			   		</div>
+  			   		<hr></hr>
+  			   	</div>
   	})
 
   	const template = this.state.loggedIn
-  	? (<div>
-   		<h1>Comments on {this.state.currentUser && this.state.currentUser.github.displayName}</h1>
-       	<CommentBox onCommentSubmit={this.onCommentSubmit} />
-  		<div className="index">
+  	? (<div class="container">
+  		 <nav className="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  			<div className="container">
+  			<p className="navbar-brand">{this.state.currentUser && this.state.currentUser.github.displayName}</p>
+  			</div>
+  		</nav>
+   			<h1>Comments on {this.state.currentUser && this.state.currentUser.github.displayName}</h1>
+   		<div className="pull-right">
       	{this.state.loggedIn && 'logged in'}
       </div>
-      <div>
+      <CommentBox onCommentSubmit={this.onCommentSubmit} />
+      	<div className="col-md-9">
+      	<div className="well">
       	{entries}
+      </div>
       </div>
       <div>
       </div></div>)
