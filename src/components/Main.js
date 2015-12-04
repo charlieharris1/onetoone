@@ -18,13 +18,16 @@ class AppComponent extends React.Component {
 		this.state = {
 			loggedIn: false,
 			userData: [],
-			currentUser: null,
+			currentUser: {},
+      loggedInUser: {},
+      users: [],
 		}
 		this.onCommentSubmit = this.onCommentSubmit.bind(this)
+    this.selectUser = this.selectUser.bind(this)
 	}
 
 	componentDidMount() {
-	  	var ref = new Firebase('https://one-to-one.firebaseio.com');
+	  var ref = new Firebase('https://one-to-one.firebaseio.com');
 		ref.authWithOAuthPopup('github', (error, authData) => {
 			if (error) {
 		    	console.log('Login Failed!', error);
@@ -32,23 +35,36 @@ class AppComponent extends React.Component {
 		    console.log(authData)
 		    console.log('Login was successfull!')
 		    this.setState({loggedIn: true})
+        authData.isAdmin = true;
+        this.setState({loggedInUser: authData})
 		    this.setState({currentUser: authData})
-		    this.bindAsArray(ref.child(`users/${authData.uid}`), 'userData');
+		    this.bindAsArray(ref.child(`comments/${authData.uid}`), 'userData');
 
+        this.bindAsObject(ref.child(`users`), 'users');
+
+        ref.child(`users/${authData.uid}`).set(authData);
 	  	})
 	}
 
-	onCommentSubmit(value, cb) {
-		var ref = new Firebase(`https://one-to-one.firebaseio.com/users/${this.state.currentUser.uid}`);
-		ref.push(value);
+	onCommentSubmit(comment, cb) {
+		var ref = new Firebase(`https://one-to-one.firebaseio.com/comments/${this.state.currentUser.uid}`);
+		ref.push({ author: this.state.loggedInUser.uid, comment: comment });
 		cb();
 	}
+
+  selectUser(e) {
+    console.log(e.target)
+    console.log('seting user to',e.target.value,'from',this.state.users)
+    this.setState({
+      currentUser: this.state.users[e.target.value]
+    })
+  }
 
   render() {
   	const entries = this.state.userData.reverse().map((entry) => {
   		return <div className="row">
   						<div className="col-md-12">
-  			   			<p className="text-left">{entry['.value']}</p>
+  			   			<p className="text-left">{entry['.comment']}</p>
   			   			<span className="pull-right">
   			   			<img src={this.state.currentUser.github.profileImageURL} alt="Profile picture" height="42" width="42"/>
   			   			</span>
@@ -56,6 +72,8 @@ class AppComponent extends React.Component {
   			   		<hr></hr>
   			   	</div>
   	})
+
+    console.log('current user',this.state.currentUser)
 
   	const template = this.state.loggedIn
   	? (<div class="container">
@@ -78,8 +96,24 @@ class AppComponent extends React.Component {
       </div></div>)
   	: '<div>You are not logged in</div>'
 
+    const userList = Object.keys(this.state.users).map((key) => {
+      return {
+        uid: this.state.users[key].uid,
+        displayName: this.state.users[key].github && this.state.users[key].github.displayName,
+      }
+    });
+    const users = userList.map((user) => {
+      console.log(user)
+      return <option value={user.uid}>{user.displayName}</option>
+    })
+
+    const selector = this.state.loggedInUser.isAdmin
+    ? <select onChange={this.selectUser}>{users}</select>
+    : <div></div>
+
     return (
     <div>
+      {selector}
       {template}
     </div>
     );
