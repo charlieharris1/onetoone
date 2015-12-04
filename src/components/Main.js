@@ -58,7 +58,7 @@ class AppComponent extends React.Component {
 
   render() {
   	const entries = this.state.comments[this.state.currentUser.uid]
-    ? _.toArray(this.state.comments[this.state.currentUser.uid]).reverse().map((entry) => {
+    ?  _.sortBy(_.toArray(this.state.comments[this.state.currentUser.uid],'timestamp')).reverse().map((entry) => {
   		return <div className="row">
   						<div className="col-md-12">
   			   			<p className="text-left">{entry.comment}</p>
