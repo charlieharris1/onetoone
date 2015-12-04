@@ -6,6 +6,7 @@ import Firebase from 'firebase';
 import ReactFireMixin from 'reactfire';
 import reactMixin from 'react-mixin';
 import CommentBox from './CommentBox';
+import _ from 'lodash';
 
 import React from 'react';
 
@@ -21,6 +22,7 @@ class AppComponent extends React.Component {
 			currentUser: {},
       loggedInUser: {},
       users: [],
+      comments: {},
 		}
 		this.onCommentSubmit = this.onCommentSubmit.bind(this)
     this.selectUser = this.selectUser.bind(this)
@@ -33,19 +35,18 @@ class AppComponent extends React.Component {
 		    	console.log('Login Failed!', error);
 		    }
 		    this.setState({loggedIn: true})
-        this.setState({loggedInUser: authData})
-		    this.setState({currentUser: authData})
-		    this.bindAsArray(ref.child(`comments/${authData.uid}`), 'userData');
+        this.bindAsObject(ref.child(`comments`), 'comments');
 
         this.bindAsObject(ref.child(`users`), 'users');
-
+        this.setState({loggedInUser: authData.uid})
+		    this.setState({currentUser: authData})
         ref.child(`users/${authData.uid}`).update(authData);
 	  	})
 	}
 
 	onCommentSubmit(comment, cb) {
 		var ref = new Firebase(`https://one-to-one.firebaseio.com/comments/${this.state.currentUser.uid}`);
-		ref.push({ author: this.state.loggedInUser.uid, comment: comment });
+		ref.push({ author: this.state.loggedInUser, comment: comment });
 		cb();
 	}
 
@@ -56,7 +57,8 @@ class AppComponent extends React.Component {
   }
 
   render() {
-  	const entries = this.state.userData.reverse().map((entry) => {
+  	const entries = this.state.comments[this.state.currentUser.uid]
+    ? _.toArray(this.state.comments[this.state.currentUser.uid]).reverse().map((entry) => {
   		return <div className="row">
   						<div className="col-md-12">
   			   			<p className="text-left">{entry.comment}</p>
@@ -67,6 +69,7 @@ class AppComponent extends React.Component {
   			   		<hr></hr>
   			   	</div>
   	})
+    : <div></div>
 
   	const template = this.state.loggedIn
   	? (
@@ -99,12 +102,13 @@ class AppComponent extends React.Component {
       return <option value={user.uid}>{user.displayName}</option>
     })
 
-    const selector = this.state.loggedInUser.isAdmin
+    const selector = this.state.users[this.state.loggedInUser] && this.state.users[this.state.loggedInUser].isAdmin
     ? <select onChange={this.selectUser}>{users}</select>
     : <div></div>
 
     return (
     <div>
+      {selector}
       {template}
     </div>
     );
