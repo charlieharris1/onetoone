@@ -32,8 +32,6 @@ class AppComponent extends React.Component {
 			if (error) {
 		    	console.log('Login Failed!', error);
 		    }
-		    console.log(authData)
-		    console.log('Login was successfull!')
 		    this.setState({loggedIn: true})
         authData.isAdmin = true;
         this.setState({loggedInUser: authData})
@@ -53,8 +51,6 @@ class AppComponent extends React.Component {
 	}
 
   selectUser(e) {
-    console.log(e.target)
-    console.log('seting user to',e.target.value,'from',this.state.users)
     this.setState({
       currentUser: this.state.users[e.target.value]
     })
@@ -64,7 +60,7 @@ class AppComponent extends React.Component {
   	const entries = this.state.userData.reverse().map((entry) => {
   		return <div className="row">
   						<div className="col-md-12">
-  			   			<p className="text-left">{entry['.comment']}</p>
+  			   			<p className="text-left">{entry.comment}</p>
   			   			<span className="pull-right">
   			   			<img src={this.state.currentUser.github.profileImageURL} alt="Profile picture" height="42" width="42"/>
   			   			</span>
@@ -73,27 +69,25 @@ class AppComponent extends React.Component {
   			   	</div>
   	})
 
-    console.log('current user',this.state.currentUser)
-
   	const template = this.state.loggedIn
-  	? (<div class="container">
-  		 <nav className="navbar navbar-inverse navbar-fixed-top" role="navigation">
-  			<div className="container">
-  			<p className="navbar-brand">{this.state.currentUser && this.state.currentUser.github.displayName}</p>
-  			</div>
-  		</nav>
-   			<h1>Comments on {this.state.currentUser && this.state.currentUser.github.displayName}</h1>
-   		<div className="pull-right">
-      	{this.state.loggedIn && 'logged in'}
-      </div>
-      <CommentBox onCommentSubmit={this.onCommentSubmit} />
-      	<div className="col-md-9">
-      	<div className="well">
-      	{entries}
-      </div>
-      </div>
-      <div>
-      </div></div>)
+  	? (
+      <div class="container">
+  		  <nav className="navbar navbar-inverse navbar-static-top" role="navigation">
+    			<div className="container">
+    			<p className="navbar-brand">{this.state.currentUser.github && this.state.currentUser.github.displayName}</p>
+    			</div>
+  		  </nav>
+     		<h1>Comments on {this.state.currentUser.github && this.state.currentUser.github.displayName}</h1>
+     		<div className="pull-right">
+        	{this.state.loggedIn && 'logged in'}
+        </div>
+        <CommentBox onCommentSubmit={this.onCommentSubmit} />
+        	<div className="col-md-9">
+          	<div className="well">
+          	 {entries}
+            </div>
+          </div>
+      </div>)
   	: '<div>You are not logged in</div>'
 
     const userList = Object.keys(this.state.users).map((key) => {
@@ -103,7 +97,6 @@ class AppComponent extends React.Component {
       }
     });
     const users = userList.map((user) => {
-      console.log(user)
       return <option value={user.uid}>{user.displayName}</option>
     })
 
