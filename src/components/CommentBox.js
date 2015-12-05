@@ -38,10 +38,11 @@ class AppComponent extends React.Component {
       <div>
       {this.state.err}
       	<form onSubmit={this.handleSubmit}>
-      		<div className="col-md-12">
-	      		<textarea className="form-control" rows="4" cols="20" value={this.state.text} onChange={this.handleTextChange}></textarea>
-	      		<div className="pull-right submit"><button className="btn btn-default" type="submit">Post comment</button></div>
-	    	</div>
+      		<textarea className="form-control" rows="3" value={this.state.text} onChange={this.handleTextChange}></textarea>
+      		<br></br>
+      		<button className="btn btn-primary btn-sm pull-right" type="submit">Post comment</button>
+	    	<div className="clearfix"></div>
+	    	<hr></hr>
 	    </form>
       </div>
     );

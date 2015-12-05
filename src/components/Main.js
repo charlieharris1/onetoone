@@ -58,19 +58,24 @@ class AppComponent extends React.Component {
   render() {
   	const entries = this.state.comments[this.state.currentUser.uid]
     ?  _.sortBy(_.toArray(this.state.comments[this.state.currentUser.uid],'timestamp')).reverse().map((entry) => {
-      return (<div className="well">
-        <div className="row">
-          <div className="col-xs-3">
-            {new Date(entry.timestamp).toString()}
-            <img src={this.state.users[entry.author] && this.state.users[entry.author].github.profileImageURL} alt="Profile picture" height="42" width="42" />
-          </div>
-          <div className="col-xs-9">
-            <Markdown>{entry.comment}</Markdown>
-          </div>
-        </div>
-      </div>);
-  	})
-    : <div></div>;
+      return (<div>
+              <li className="media">
+                <a href="#" className="pull-left">
+                  <img src={this.state.users[entry.author] && this.state.users[entry.author].github.profileImageURL} alt className="img-circle">
+                  </img>
+                </a>
+                <div className="media-body">
+                  <span className="text-muted pull-right">
+                    <small className="textMuted">{new Date(entry.timestamp).toString()}</small>
+                  </span>
+                  <p>
+                    <Markdown>{entry.comment}</Markdown>
+                  </p>
+                </div>
+              </li>
+              </div>);
+  	         })
+            : <div></div>;
 
     const userList = Object.keys(this.state.users).map((key) => {
       return {
@@ -84,40 +89,45 @@ class AppComponent extends React.Component {
     })    
 
     const selector = this.state.users[this.state.loggedInUser] && this.state.users[this.state.loggedInUser].isAdmin
-    ? <select onChange={this.selectUser}>{users}</select>
+    ? <div className="className=nav nav-bar navbar-right"><select onChange={this.selectUser}>{users}</select></div>
     : <div></div>
 
   	const template = this.state.loggedInUser
   	? (
-      <div>
-  		  <nav className="navbar navbar-inverse navbar-static-top" role="navigation">
-          <div className="navbar-header">
-    			   <p className="navbar-brand">{this.state.users[this.state.loggedInUser] && this.state.users[this.state.loggedInUser].github.displayName}</p>
-          </div>
-          <div className="nav navbar-nav navbar-right">
-            <button className="btn">Log out</button>
-          </div>
-  		  </nav>
-      <div className="row">
-        <div className="col-xs-12 selector">
-          <span className="pull-left">Comments on {this.state.currentUser.github && this.state.currentUser.github.displayName}</span>
-          <div className="pull-right">{selector}</div>
+      <div className="container">
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <p className="navbar-brand">{this.state.users[this.state.loggedInUser] && this.state.users[this.state.loggedInUser].github.displayName}</p>
+            <div className="nav nav-bar navbar-right">{selector}</div>
         </div>
       </div>
+      </nav>
 
       <div className="container">
         <div className="row">
-          <div className="col-xs-6">
-            {entries}
+          <div className="col-md-12 text-center">
+            <h2>Comments on {this.state.currentUser.github && this.state.currentUser.github.displayName}</h2>
+            <br></br>
           </div>
-    
-          <div className="col-xs-6">
-            <CommentBox onCommentSubmit={this.onCommentSubmit} />
+          <div className="row">
+            <div className="col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4">
+              <div className="twt-wrapper">
+                <div className="panel planel-info">
+                  <div className="panel-body">
+                    <CommentBox onCommentSubmit={this.onCommentSubmit}/>
+                    <ul className="media-list">
+                    {entries}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
       </div>)
-  	: <div>You are not logged in</div>
+  	 : <div>You are not logged in</div>
 
     return (
     <div>
